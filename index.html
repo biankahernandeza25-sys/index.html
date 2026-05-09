@@ -2,9 +2,108 @@
 <html lang="es">
 
 <head>
+    <!-- AGREGA ESTA LIBRERÍA dentro de <head> -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <!-- AGREGA ESTA SECCIÓN dentro del PANEL donde ya tienes los formularios -->
+
+    <div class="grid">
+
+        <div>
+            <h2>Escanear Código QR</h2>
+
+            <button onclick="iniciarScanner()">Activar Cámara</button>
+            <button class="red" onclick="detenerScanner()">Detener Cámara</button>
+
+            <div id="reader" style="width:100%; margin-top:10px;"></div>
+
+            <div id="scanResult" class="info" style="margin-top:10px;"></div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // VARIABLES
+        let scanner;
+
+        // INICIAR CÁMARA
+        function iniciarScanner() {
+
+            document.getElementById("scanResult").innerHTML = "Cámara activada...";
+
+            scanner = new Html5Qrcode("reader");
+
+            scanner.start({
+                    facingMode: "environment"
+                }, {
+                    fps: 10,
+                    qrbox: 250
+                },
+                onScanSuccess
+            ).catch(err => {
+                alert("No se pudo abrir cámara");
+            });
+
+        }
+
+        // CUANDO ESCANEA
+        function onScanSuccess(decodedText) {
+
+            let id = decodedText.trim();
+
+            // buscar estudiante por ID dentro registros
+            let alumno = registros.find(x => x.id === id || x.nombre === id);
+
+            if (alumno) {
+
+                let fecha = new Date().toLocaleDateString();
+                let hora = new Date().toLocaleTimeString();
+
+                document.getElementById("scanResult").innerHTML = `
+<p><b>Entrada Registrada</b></p>
+<p>${alumno.nombre}</p>
+<p>${alumno.tipo}</p>
+<p>${hora}</p>
+`;
+
+                beep();
+
+            } else {
+
+                document.getElementById("scanResult").innerHTML = `
+<p>ID no encontrado:</p>
+<p>${id}</p>
+`;
+
+            }
+
+        }
+
+        // DETENER
+        function detenerScanner() {
+
+            if (scanner) {
+                scanner.stop().then(() => {
+                    document.getElementById("reader").innerHTML = "";
+                    document.getElementById("scanResult").innerHTML = "Cámara detenida";
+                });
+            }
+
+        }
+
+        // SONIDO
+        function beep() {
+            let audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+            audio.play();
+        }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ctp.come</title>
+    <title>ctp.come PRO + QR</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         * {
@@ -26,7 +125,7 @@
         
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
             background: #111827;
             padding: 25px;
             border-radius: 18px;
@@ -134,6 +233,14 @@
             color: #94a3b8;
             margin-top: 10px;
         }
+        
+        .qrbox {
+            margin-top: 10px;
+            background: white;
+            padding: 10px;
+            display: inline-block;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
@@ -144,7 +251,7 @@
         <!-- LOGIN -->
         <div id="loginBox">
 
-            <h1>ctp.come</h1>
+            <h1>ctp.come PRO</h1>
 
             <div class="grid">
 
@@ -171,22 +278,36 @@
         <!-- PANEL -->
         <div id="panel" class="hidden">
 
-            <h1>ctp.come</h1>
+            <h1>ctp.come QR</h1>
 
             <div class="info">
                 <p id="bienvenida"></p>
                 <p id="contador"></p>
             </div>
 
-            <input type="text" id="nombre" placeholder="Nombre del estudiante">
-            <input type="text" id="seccion" placeholder="Sección / Grado">
+            <div class="grid">
 
-            <select id="tipo">
+                <div>
+                    <input type="text" id="nombre" placeholder="Nombre del estudiante">
+                    <input type="text" id="seccion" placeholder="Sección / Grado">
+
+                    <select id="tipo">
 <option value="Becado">Becado</option>
 <option value="Paga">Paga</option>
 </select>
 
-            <button onclick="guardar()">Registrar</button>
+                    <button onclick="guardar()">Registrar</button>
+                </div>
+
+                <div>
+                    <h2>Crear Código QR</h2>
+                    <input type="text" id="qrNombre" placeholder="Nombre del estudiante">
+                    <button onclick="crearQR()">Generar QR</button>
+
+                    <div id="resultadoQR"></div>
+                </div>
+
+            </div>
 
             <input type="text" id="buscar" placeholder="Buscar estudiante..." onkeyup="mostrarTabla()">
 
@@ -240,7 +361,6 @@
             });
             localStorage.setItem("usuarios", JSON.stringify(usuarios));
 
-            // entra automático
             localStorage.setItem("usuarioActivo", u);
             actual = u;
 
@@ -266,7 +386,7 @@
 
         }
 
-        // MOSTRAR PANEL
+        // PANEL
         function mostrarPanel() {
 
             document.getElementById("loginBox").classList.add("hidden");
@@ -278,7 +398,7 @@
 
         }
 
-        // GUARDAR
+        // GUARDAR ESTUDIANTE
         function guardar() {
 
             let nombre = document.getElementById("nombre").value.trim();
@@ -306,6 +426,34 @@
             document.getElementById("seccion").value = "";
 
             mostrarTabla();
+
+        }
+
+        // NUEVO: CREAR QR
+        function crearQR() {
+
+            let nombre = document.getElementById("qrNombre").value.trim();
+
+            if (nombre == "") {
+                alert("Escriba nombre");
+                return;
+            }
+
+            let id = "ID-" + Date.now();
+
+            document.getElementById("resultadoQR").innerHTML = `
+<p><b>${nombre}</b></p>
+<p>ID: ${id}</p>
+<div id="qrcode" class="qrbox"></div>
+`;
+
+            new QRCode(document.getElementById("qrcode"), {
+                text: id,
+                width: 180,
+                height: 180
+            });
+
+            document.getElementById("qrNombre").value = "";
 
         }
 
