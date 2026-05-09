@@ -2,6 +2,169 @@
 <html lang="es">
 
 <head>
+    <meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<link rel="manifest" href="manifest.json">
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js");
+}
+</script>
+    <!-- PEGAR dentro de <head> -->
+
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="manifest" href="manifest.json">
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("sw.js");
+            });
+        }
+    </script>
+    <!-- AGREGA ESTA LIBRERÍA EN <head> -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <!-- AGREGA ESTE BOTÓN donde quieras en tu panel -->
+    <button onclick="abrirScanner()">Escanear QR</button>
+
+    <!-- AGREGA ESTA VENTANA FULLSCREEN antes de cerrar </body> -->
+    <div id="scannerModal">
+
+        <div id="topBar">
+            <button onclick="cerrarScanner()">✖ Cerrar</button>
+            <span>Escanear Código QR</span>
+        </div>
+
+        <div id="reader"></div>
+
+        <div id="scanMsg">Apunte la cámara al código QR</div>
+
+    </div>
+
+    <style>
+        #scannerModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+        }
+        
+        #topBar {
+            background: #111827;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+        }
+        
+        #topBar button {
+            width: auto;
+            padding: 10px 15px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+        }
+        
+        #reader {
+            flex: 1;
+            width: 100%;
+        }
+        
+        #scanMsg {
+            background: #111827;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+        }
+    </style>
+
+    <script>
+        let scanner;
+
+        // ABRIR FULLSCREEN
+        function abrirScanner() {
+
+            document.getElementById("scannerModal").style.display = "flex";
+
+            scanner = new Html5Qrcode("reader");
+
+            scanner.start({
+                    facingMode: "environment"
+                }, {
+                    fps: 10,
+                    qrbox: {
+                        width: 280,
+                        height: 280
+                    }
+                },
+                onScanSuccess
+            ).catch(err => {
+                alert("No se pudo abrir cámara");
+            });
+
+        }
+
+        // CUANDO ESCANEA
+        function onScanSuccess(decodedText) {
+
+            let id = decodedText.trim();
+
+            // AQUÍ busca estudiante
+            let alumno = registros.find(x => x.id === id || x.nombre === id);
+
+            if (alumno) {
+
+                document.getElementById("scanMsg").innerHTML =
+                    "✔ " + alumno.nombre + " registrado";
+
+                beep();
+                navigator.vibrate(200);
+
+            } else {
+
+                document.getElementById("scanMsg").innerHTML =
+                    "ID no encontrado";
+
+            }
+
+        }
+
+        // CERRAR
+        function cerrarScanner() {
+
+            if (scanner) {
+                scanner.stop().then(() => {
+                    document.getElementById("scannerModal").style.display = "none";
+                    document.getElementById("reader").innerHTML = "";
+                });
+            } else {
+                document.getElementById("scannerModal").style.display = "none";
+            }
+
+        }
+
+        // SONIDO
+        function beep() {
+            let audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+            audio.play();
+        }
+    </script>
     <!-- AGREGA ESTA LIBRERÍA dentro de <head> -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
@@ -10,10 +173,7 @@
     <div class="grid">
 
         <div>
-            <h2>Escanear Código QR</h2>
 
-            <button onclick="iniciarScanner()">Activar Cámara</button>
-            <button class="red" onclick="detenerScanner()">Detener Cámara</button>
 
             <div id="reader" style="width:100%; margin-top:10px;"></div>
 
@@ -98,10 +258,9 @@
             audio.play();
         }
     </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ctp.come PRO + QR</title>
+    <title>ctp.come QR</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -251,7 +410,7 @@
         <!-- LOGIN -->
         <div id="loginBox">
 
-            <h1>ctp.come PRO</h1>
+            <h1>ctp.come</h1>
 
             <div class="grid">
 
@@ -271,7 +430,7 @@
 
             </div>
 
-            <p class="small">Sistema Profesional Moderno de Comedor Escolar</p>
+            <p class="small">Sistema de comedor </p>
 
         </div>
 
