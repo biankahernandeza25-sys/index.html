@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ctp.come</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: #111827;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, .45);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #38bdf8;
+        }
+        
+        h2 {
+            margin: 10px 0;
+            font-size: 20px;
+        }
+        
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        input,
+        select {
+            background: #1f2937;
+            color: white;
+        }
+        
+        button {
+            background: #38bdf8;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .3s;
+        }
+        
+        button:hover {
+            background: #0ea5e9;
+            transform: scale(1.02);
+        }
+        
+        .red {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .red:hover {
+            background: #dc2626;
+        }
+        
+        .delete {
+            background: #dc2626;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .info {
+            background: #1e293b;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th,
+        td {
+            border: 1px solid #374151;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        th {
+            background: #2563eb;
+        }
+        
+        tr:nth-child(even) {
+            background: #1f2937;
+        }
+        
+        .small {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- LOGIN -->
+        <div id="loginBox">
+
+            <h1>ctp.come</h1>
+
+            <div class="grid">
+
+                <div>
+                    <h2>Crear Usuario</h2>
+                    <input type="text" id="newUser" placeholder="Usuario">
+                    <input type="password" id="newPass" placeholder="Contraseña">
+                    <button onclick="crearUsuario()">Crear Cuenta</button>
+                </div>
+
+                <div>
+                    <h2>Iniciar Sesión</h2>
+                    <input type="text" id="loginUser" placeholder="Usuario">
+                    <input type="password" id="loginPass" placeholder="Contraseña">
+                    <button onclick="login()">Entrar</button>
+                </div>
+
+            </div>
+
+            <p class="small">Sistema Profesional Moderno de Comedor Escolar</p>
+
+        </div>
+
+        <!-- PANEL -->
+        <div id="panel" class="hidden">
+
+            <h1>ctp.come</h1>
+
+            <div class="info">
+                <p id="bienvenida"></p>
+                <p id="contador"></p>
+            </div>
+
+            <input type="text" id="nombre" placeholder="Nombre del estudiante">
+            <input type="text" id="seccion" placeholder="Sección / Grado">
+
+            <select id="tipo">
+<option value="Becado">Becado</option>
+<option value="Paga">Paga</option>
+</select>
+
+            <button onclick="guardar()">Registrar</button>
+
+            <input type="text" id="buscar" placeholder="Buscar estudiante..." onkeyup="mostrarTabla()">
+
+            <button class="red" onclick="logout()">Cerrar Sesión</button>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Sección</th>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>X</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla"></tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    <script>
+        let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+        let registros = JSON.parse(localStorage.getItem("registros")) || [];
+        let actual = localStorage.getItem("usuarioActivo");
+
+        if (actual) {
+            mostrarPanel();
+        }
+
+        // CREAR USUARIO
+        function crearUsuario() {
+
+            let u = document.getElementById("newUser").value.trim();
+            let p = document.getElementById("newPass").value.trim();
+
+            if (u == "" || p == "") {
+                alert("Complete datos");
+                return;
+            }
+
+            if (usuarios.find(x => x.usuario === u)) {
+                alert("Ese usuario ya existe");
+                return;
+            }
+
+            usuarios.push({
+                usuario: u,
+                pass: p
+            });
+            localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
+            // entra automático
+            localStorage.setItem("usuarioActivo", u);
+            actual = u;
+
+            mostrarPanel();
+
+        }
+
+        // LOGIN
+        function login() {
+
+            let u = document.getElementById("loginUser").value.trim();
+            let p = document.getElementById("loginPass").value.trim();
+
+            let ok = usuarios.find(x => x.usuario === u && x.pass === p);
+
+            if (ok) {
+                localStorage.setItem("usuarioActivo", u);
+                actual = u;
+                mostrarPanel();
+            } else {
+                alert("Usuario o contraseña incorrectos");
+            }
+
+        }
+
+        // MOSTRAR PANEL
+        function mostrarPanel() {
+
+            document.getElementById("loginBox").classList.add("hidden");
+            document.getElementById("panel").classList.remove("hidden");
+
+            document.getElementById("bienvenida").innerHTML = "Bienvenido: <b>" + actual + "</b>";
+
+            mostrarTabla();
+
+        }
+
+        // GUARDAR
+        function guardar() {
+
+            let nombre = document.getElementById("nombre").value.trim();
+            let seccion = document.getElementById("seccion").value.trim();
+            let tipo = document.getElementById("tipo").value;
+
+            if (nombre == "" || seccion == "") {
+                alert("Complete datos");
+                return;
+            }
+
+            let fecha = new Date().toLocaleDateString();
+
+            registros.push({
+                usuario: actual,
+                nombre: nombre,
+                seccion: seccion,
+                tipo: tipo,
+                fecha: fecha
+            });
+
+            localStorage.setItem("registros", JSON.stringify(registros));
+
+            document.getElementById("nombre").value = "";
+            document.getElementById("seccion").value = "";
+
+            mostrarTabla();
+
+        }
+
+        // TABLA
+        function mostrarTabla() {
+
+            let tabla = document.getElementById("tabla");
+            tabla.innerHTML = "";
+
+            let buscar = document.getElementById("buscar").value.toLowerCase();
+
+            let datos = registros.filter(x =>
+                x.usuario === actual &&
+                x.nombre.toLowerCase().includes(buscar)
+            );
+
+            let becados = 0;
+            let paga = 0;
+
+            datos.forEach((r, i) => {
+
+                if (r.tipo == "Becado") becados++;
+                if (r.tipo == "Paga") paga++;
+
+                tabla.innerHTML += `
+<tr>
+<td>${r.nombre}</td>
+<td>${r.seccion}</td>
+<td>${r.tipo}</td>
+<td>${r.fecha}</td>
+<td><button class="delete" onclick="eliminar(${i})">X</button></td>
+</tr>
+`;
+
+            });
+
+            document.getElementById("contador").innerHTML =
+                "Becados: <b>" + becados + "</b> | Pagan: <b>" + paga + "</b>";
+
+        }
+
+        // ELIMINAR
+        function eliminar(indice) {
+
+            let datos = registros.filter(x => x.usuario === actual);
+            let item = datos[indice];
+
+            registros = registros.filter(x =>
+                !(x.usuario === actual &&
+                    x.nombre === item.nombre &&
+                    x.fecha === item.fecha &&
+                    x.seccion === item.seccion)
+            );
+
+            localStorage.setItem("registros", JSON.stringify(registros));
+
+            mostrarTabla();
+
+        }
+
+        // CERRAR
+        function logout() {
+            localStorage.removeItem("usuarioActivo");
+            location.reload();
+        }
+    </script>
+
+</body>
+
+</html>
