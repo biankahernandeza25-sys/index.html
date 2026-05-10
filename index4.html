@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ctp.come</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#0f172a,#1e293b);
+min-height:100vh;
+padding:20px;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.container{
+width:100%;
+max-width:1150px;
+background:#111827;
+padding:25px;
+border-radius:18px;
+box-shadow:0 0 25px rgba(0,0,0,.45);
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+color:#38bdf8;
+}
+
+h2{
+margin-bottom:12px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+.menu{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+gap:10px;
+margin-bottom:20px;
+}
+
+.card{
+background:#1e293b;
+padding:18px;
+border-radius:14px;
+margin-bottom:15px;
+}
+
+input,select,button{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:none;
+border-radius:10px;
+font-size:16px;
+}
+
+input,select{
+background:#111827;
+color:white;
+}
+
+button{
+background:#2563eb;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+.red{background:#ef4444;}
+.green{background:#22c55e;}
+
+.hidden{display:none;}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+border:1px solid #374151;
+padding:10px;
+text-align:center;
+}
+
+th{
+background:#2563eb;
+}
+
+#scannerModal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+display:none;
+flex-direction:column;
+z-index:9999;
+}
+
+#reader{
+flex:1;
+width:100%;
+}
+
+#scanMsg{
+background:#111827;
+padding:15px;
+text-align:center;
+font-size:18px;
+}
+
+.qrbox{
+background:white;
+padding:10px;
+display:inline-block;
+border-radius:10px;
+margin-top:10px;
+}
+
+@media(max-width:800px){
+.grid{
+grid-template-columns:1fr;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div id="loginBox">
+
+<h1>ctp.come</h1>
+
+<div class="grid">
+
+<div class="card">
+<h2>Crear Usuario</h2>
+<input type="text" id="newUser" placeholder="Usuario">
+<input type="password" id="newPass" placeholder="Contraseña">
+<button onclick="crearCuenta()">Registrarme</button>
+</div>
+
+<div class="card">
+<h2>Iniciar Sesión</h2>
+<input type="text" id="loginUser" placeholder="Usuario">
+<input type="password" id="loginPass" placeholder="Contraseña">
+<button onclick="login()">Entrar</button>
+</div>
+
+</div>
+
+</div>
+
+<!-- PANEL -->
+<div id="panel" class="hidden">
+
+<h1>ctp.come</h1>
+
+<div class="menu">
+<button onclick="mostrar('reg')">Registrar</button>
+<button onclick="mostrar('qr')">Crear QR</button>
+<button onclick="mostrar('scan')">Escanear</button>
+<button onclick="mostrar('lista')">Lista</button>
+<button onclick="mostrar('historial')">Historial</button>
+<button onclick="logout()" class="red">Salir</button>
+</div>
+
+<!-- registrar -->
+<div id="reg" class="card seccion">
+<h2>Registrar Estudiante</h2>
+
+<input type="text" id="nombre" placeholder="Nombre completo">
+<input type="text" id="seccion" placeholder="Sección">
+
+<select id="tipo">
+<option value="Becado">Becado</option>
+<option value="Paga">Paga</option>
+</select>
+
+<button onclick="guardar()">Guardar</button>
+</div>
+
+<!-- qr -->
+<div id="qr" class="card seccion hidden">
+<h2>Generar Código QR</h2>
+
+<input type="text" id="buscarQR" placeholder="Nombre estudiante">
+<button class="green" onclick="crearQR()">Generar QR</button>
+
+<div id="resultadoQR"></div>
+</div>
+
+<!-- scan -->
+<div id="scan" class="card seccion hidden">
+<h2>Escanear QR</h2>
+<button onclick="abrirScanner()">Abrir Cámara</button>
+</div>
+
+<!-- lista -->
+<div id="lista" class="card seccion hidden">
+<h2>Lista Estudiantes</h2>
+
+<input type="text" id="buscar" placeholder="Buscar..." onkeyup="mostrarTabla()">
+
+<table>
+<thead>
+<tr>
+<th>Nombre</th>
+<th>Sección</th>
+<th>Tipo</th>
+<th>X</th>
+</tr>
+</thead>
+
+<tbody id="tabla"></tbody>
+</table>
+</div>
+
+<!-- historial -->
+<div id="historial" class="card seccion hidden">
+<h2>Historial Entradas</h2>
+
+<table>
+<thead>
+<tr>
+<th>Nombre</th>
+<th>Sección</th>
+<th>Tipo</th>
+<th>Hora</th>
+<th>Fecha</th>
+</tr>
+</thead>
+
+<tbody id="tablaHistorial"></tbody>
+</table>
+</div>
+
+</div>
+
+</div>
+
+<!-- scanner -->
+<div id="scannerModal">
+<button onclick="cerrarScanner()" class="red">Cerrar</button>
+<div id="reader"></div>
+<div id="scanMsg">Apunte la cámara al QR</div>
+</div>
+
+<script>
+let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+let registros = JSON.parse(localStorage.getItem("registros")) || [];
+let historial = JSON.parse(localStorage.getItem("historial")) || [];
+
+let actual = localStorage.getItem("activo");
+let scanner;
+
+if(actual){
+entrarPanel();
+mostrarHistorial();
+}
+
+/* usuario */
+function crearCuenta(){
+
+let u = newUser.value.trim();
+let p = newPass.value.trim();
+
+if(!u || !p) return alert("Complete datos");
+
+if(usuarios.find(x=>x.user===u))
+return alert("Ya existe");
+
+usuarios.push({user:u,pass:p});
+
+localStorage.setItem("usuarios",JSON.stringify(usuarios));
+
+alert("Cuenta creada");
+}
+
+function login(){
+
+let u = loginUser.value.trim();
+let p = loginPass.value.trim();
+
+let ok = usuarios.find(x=>x.user===u && x.pass===p);
+
+if(ok){
+localStorage.setItem("activo",u);
+actual=u;
+entrarPanel();
+mostrarHistorial();
+}else{
+alert("Datos incorrectos");
+}
+}
+
+function logout(){
+localStorage.removeItem("activo");
+location.reload();
+}
+
+function entrarPanel(){
+loginBox.classList.add("hidden");
+panel.classList.remove("hidden");
+mostrarTabla();
+}
+
+/* menu */
+function mostrar(id){
+
+document.querySelectorAll(".seccion")
+.forEach(x=>x.classList.add("hidden"));
+
+document.getElementById(id)
+.classList.remove("hidden");
+}
+
+/* guardar */
+function guardar(){
+
+let nom = nombre.value.trim();
+let sec = seccion.value.trim();
+let tipoEst = tipo.value;
+
+if(!nom || !sec) return alert("Complete");
+
+registros.push({
+encargado:actual,
+nombre:nom,
+seccion:sec,
+tipo:tipoEst
+});
+
+localStorage.setItem("registros",JSON.stringify(registros));
+
+nombre.value="";
+seccion.value="";
+
+mostrarTabla();
+
+alert("Guardado");
+}
+
+/* tabla */
+function mostrarTabla(){
+
+let b = buscar.value.toLowerCase();
+
+tabla.innerHTML="";
+
+registros
+.filter(x=>x.encargado===actual)
+.filter(x=>x.nombre.toLowerCase().includes(b))
+.forEach((r,i)=>{
+
+tabla.innerHTML += `
+<tr>
+<td>${r.nombre}</td>
+<td>${r.seccion}</td>
+<td>${r.tipo}</td>
+<td><button onclick="eliminar(${i})" class="red">X</button></td>
+</tr>
+`;
+
+});
+}
+
+function eliminar(i){
+
+let datos = registros.filter(x=>x.encargado===actual);
+let item = datos[i];
+
+registros = registros.filter(x=>x!==item);
+
+localStorage.setItem("registros",JSON.stringify(registros));
+
+mostrarTabla();
+}
+
+/* qr */
+function crearQR(){
+
+let nom = buscarQR.value.trim();
+
+let alumno = registros.find(x=>
+x.encargado===actual &&
+x.nombre.toLowerCase()===nom.toLowerCase()
+);
+
+if(!alumno) return alert("No existe");
+
+let datosQR = JSON.stringify({
+nombre:alumno.nombre,
+seccion:alumno.seccion,
+tipo:alumno.tipo
+});
+
+resultadoQR.innerHTML = `
+<p><b>${alumno.nombre}</b></p>
+<p>${alumno.seccion}</p>
+<p>${alumno.tipo}</p>
+<div id="qrcode" class="qrbox"></div>
+`;
+
+new QRCode(document.getElementById("qrcode"),{
+text:datosQR,
+width:200,
+height:200
+});
+}
+
+/* scanner */
+function abrirScanner(){
+
+scannerModal.style.display="flex";
+
+scanner = new Html5Qrcode("reader");
+
+scanner.start(
+{facingMode:"environment"},
+{fps:10,qrbox:250},
+scanOK
+);
+}
+
+/* control 1 vez por dia */
+function scanOK(txt){
+
+try{
+
+let d = JSON.parse(txt);
+
+let hoy = new Date().toLocaleDateString();
+let hora = new Date().toLocaleTimeString();
+
+let usado = historial.find(x =>
+x.nombre===d.nombre &&
+x.fecha===hoy
+);
+
+if(usado){
+
+scanMsg.innerHTML = `
+❌ ${d.nombre}<br>
+YA USÓ COMEDOR HOY
+`;
+
+beepError();
+return;
+}
+
+historial.push({
+nombre:d.nombre,
+seccion:d.seccion,
+tipo:d.tipo,
+hora:hora,
+fecha:hoy
+});
+
+localStorage.setItem("historial",JSON.stringify(historial));
+
+scanMsg.innerHTML = `
+✔ ${d.nombre}<br>
+${d.seccion}<br>
+${d.tipo}<br>
+${hora}<br>
+REGISTRADO
+`;
+
+beep();
+
+mostrarHistorial();
+
+}catch{
+scanMsg.innerHTML="QR inválido";
+}
+}
+
+/* historial */
+function mostrarHistorial(){
+
+tablaHistorial.innerHTML="";
+
+[...historial].reverse().forEach(r=>{
+
+tablaHistorial.innerHTML += `
+<tr>
+<td>${r.nombre}</td>
+<td>${r.seccion}</td>
+<td>${r.tipo}</td>
+<td>${r.hora}</td>
+<td>${r.fecha}</td>
+</tr>
+`;
+
+});
+}
+
+/* cerrar scanner */
+function cerrarScanner(){
+
+scanner.stop().then(()=>{
+scannerModal.style.display="none";
+reader.innerHTML="";
+});
+}
+
+/* sonidos */
+function beep(){
+new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg").play();
+}
+
+function beepError(){
+new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg").play();
+}
+</script>
+
+</body>
+</html>
