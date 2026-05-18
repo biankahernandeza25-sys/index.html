@@ -3,13 +3,19 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
     <title>CICOMED</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -18,51 +24,85 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
+            background: linear-gradient(135deg, #050816, #111827, #1e1b4b);
             min-height: 100vh;
             padding: 20px;
-            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: white;
         }
         
         .container {
             width: 100%;
             max-width: 1150px;
-            background: #111827;
+            background: #0f172a;
             padding: 25px;
-            border-radius: 18px;
-            box-shadow: 0 0 25px rgba(0, 0, 0, .45);
+            border-radius: 22px;
+            border: 1px solid #312e81;
+            box-shadow: 0 0 30px rgba(0, 0, 0, .5);
         }
         
-        h1 {
+        .hidden {
+            display: none !important;
+        }
+        /* LOGO */
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            background: transparent;
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+        
+        .logoBox {
             text-align: center;
-            margin-bottom: 20px;
-            color: #31b7f0;
+            margin-bottom: 25px;
         }
         
-        h2 {
-            margin-bottom: 12px;
+        .logoImg {
+            width: 120px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 12px rgba(139, 92, 246, .6));
         }
+        
+        .logoText {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #8b5cf6;
+            text-shadow: 0 0 12px rgba(139, 92, 246, .6);
+        }
+        
+        .logoSub {
+            color: #cbd5e1;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        /* LOGIN */
         
         .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .menu {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
         }
         
         .card {
-            background: #1e293b;
-            padding: 18px;
-            border-radius: 14px;
+            width: 100%;
+            max-width: 420px;
+            background: #111827;
+            padding: 20px;
+            border-radius: 18px;
+            border: 1px solid #312e81;
+        }
+        
+        h2 {
             margin-bottom: 15px;
         }
         
@@ -79,7 +119,7 @@
         
         input,
         select {
-            background: #111827;
+            background: #0f172a;
             color: white;
         }
         
@@ -88,10 +128,12 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
+            transition: .2s;
         }
         
         button:hover {
-            background: #1d4ed8;
+            background: #7c3aed;
+            transform: scale(1.02);
         }
         
         .red {
@@ -102,9 +144,35 @@
             background: #22c55e;
         }
         
-        .hidden {
-            display: none;
+        .link {
+            text-align: center;
+            margin-top: 10px;
+            color: #38bdf8;
+            cursor: pointer;
+            font-size: 14px;
         }
+        
+        .link:hover {
+            text-decoration: underline;
+        }
+        /* MENU */
+        
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        /* SECCIONES */
+        
+        .seccion {
+            background: #111827;
+            padding: 18px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            border: 1px solid #312e81;
+        }
+        /* TABLAS */
         
         table {
             width: 100%;
@@ -122,6 +190,39 @@
         th {
             background: #2563eb;
         }
+        /* QR */
+        
+        .qrbox {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 15px;
+        }
+        /* POPUP */
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .modalBox {
+            background: #111827;
+            padding: 25px;
+            border-radius: 18px;
+            width: 92%;
+            max-width: 420px;
+            border: 1px solid #7c3aed;
+        }
+        /* SCANNER */
         
         #scannerModal {
             position: fixed;
@@ -144,20 +245,18 @@
             background: #111827;
             padding: 15px;
             text-align: center;
-            font-size: 18px;
-        }
-        
-        .qrbox {
-            background: white;
-            padding: 10px;
-            display: inline-block;
-            border-radius: 10px;
-            margin-top: 10px;
+            font-size: 20px;
         }
         
         @media(max-width:800px) {
-            .grid {
-                grid-template-columns: 1fr;
+            .menu {
+                grid-template-columns: 1fr 1fr;
+            }
+            .logoText {
+                font-size: 30px;
+            }
+            .logoImg {
+                width: 90px;
             }
         }
     </style>
@@ -170,22 +269,42 @@
         <!-- LOGIN -->
         <div id="loginBox">
 
-            <h1>CICOMED</h1>
+            <div class="logoBox">
+                <header class="header"></header>
+                <img src="https://i.ibb.co/HDNkGFf5/logo.png" alt="logo" class="logo">
+                </header>
+                <div class="logoText">CICOMED</div>
+                <div class="logoSub">
+                    Sistema Inteligente de Comedor Estudiantil
+                </div>
+            </div>
 
             <div class="grid">
 
                 <div class="card">
-                    <h2>Crear Usuario</h2>
-                    <input type="text" id="newUser" placeholder="Usuario">
-                    <input type="password" id="newPass" placeholder="Contraseña">
-                    <button onclick="crearCuenta()">Registrarme</button>
-                </div>
 
-                <div class="card">
                     <h2>Iniciar Sesión</h2>
-                    <input type="text" id="loginUser" placeholder="Usuario">
+
+                    <input type="email" id="loginUser" placeholder="Correo electrónico">
+
                     <input type="password" id="loginPass" placeholder="Contraseña">
-                    <button onclick="login()">Entrar</button>
+
+                    <p onclick="togglePass()" class="link">
+                        👁 Ver contraseña
+                    </p>
+
+                    <button onclick="login()">
+Entrar
+</button>
+
+                    <p onclick="mostrarRegistro()" class="link">
+                        ➕ Crear cuenta
+                    </p>
+
+                    <p onclick="recuperarClave()" class="link">
+                        ¿Olvidó contraseña?
+                    </p>
+
                 </div>
 
             </div>
@@ -195,74 +314,132 @@
         <!-- PANEL -->
         <div id="panel" class="hidden">
 
-            <h1>CICOMED</h1>
+            <div class="logoBox">
+                <img src="logo.png" class="logoImg">
 
-            <div class="menu">
-                <button onclick="mostrar('reg')">Registrar</button>
-                <button onclick="mostrar('qr')">Crear QR</button>
-                <button onclick="mostrar('scan')">Escanear</button>
-                <button onclick="mostrar('lista')">Lista</button>
-                <button onclick="mostrar('historial')">Historial</button>
-                <button onclick="logout()" class="red">Salir</button>
+                <div class="logoText">CICOMED</div>
+
+                <div id="bienvenida" class="logoSub">
+                    Sistema Inteligente de Comedor
+                </div>
             </div>
 
-            <!-- registrar -->
-            <div id="reg" class="card seccion">
+            <div class="menu">
+
+                <button onclick="mostrar('reg')">
+Registrar
+</button>
+
+                <button onclick="mostrar('qr')">
+Crear QR
+</button>
+
+                <button onclick="mostrar('scan')">
+Escanear
+</button>
+
+                <button onclick="mostrar('lista')">
+Lista
+</button>
+
+                <button onclick="mostrar('historial')">
+Historial
+</button>
+
+                <button onclick="logout()" class="red">
+Salir
+</button>
+
+            </div>
+
+            <!-- REGISTRAR -->
+            <div id="reg" class="seccion">
+
                 <h2>Registrar Estudiante</h2>
 
                 <input type="text" id="nombre" placeholder="Nombre completo">
+
                 <input type="text" id="seccion" placeholder="Sección">
 
                 <select id="tipo">
-<option value="Becado">Becado</option>
-<option value="Paga">Paga</option>
+
+<option value="Becado">
+Becado
+</option>
+
+<option value="Paga">
+Paga
+</option>
+
 </select>
 
-                <button onclick="guardar()">Guardar</button>
+                <button onclick="guardar()">
+Guardar
+</button>
+
             </div>
 
-            <!-- qr -->
-            <div id="qr" class="card seccion hidden">
+            <!-- QR -->
+            <div id="qr" class="seccion hidden">
+
                 <h2>Generar Código QR</h2>
 
                 <input type="text" id="buscarQR" placeholder="Nombre estudiante">
-                <button class="green" onclick="crearQR()">Generar QR</button>
+
+                <button onclick="crearQR()" class="green">
+Generar QR
+</button>
 
                 <div id="resultadoQR"></div>
+
             </div>
 
-            <!-- scan -->
-            <div id="scan" class="card seccion hidden">
+            <!-- SCAN -->
+            <div id="scan" class="seccion hidden">
+
                 <h2>Escanear QR</h2>
-                <button onclick="abrirScanner()">Abrir Cámara</button>
+
+                <button onclick="abrirScanner()">
+Abrir Cámara
+</button>
+
             </div>
 
-            <!-- lista -->
-            <div id="lista" class="card seccion hidden">
+            <!-- LISTA -->
+            <div id="lista" class="seccion hidden">
+
                 <h2>Lista Estudiantes</h2>
 
                 <input type="text" id="buscar" placeholder="Buscar..." onkeyup="mostrarTabla()">
 
                 <table>
+
                     <thead>
+
                         <tr>
                             <th>Nombre</th>
                             <th>Sección</th>
                             <th>Tipo</th>
                             <th>X</th>
                         </tr>
+
                     </thead>
 
                     <tbody id="tabla"></tbody>
+
                 </table>
+
             </div>
 
-            <!-- historial -->
-            <div id="historial" class="card seccion hidden">
+            <!-- HISTORIAL -->
+            <div id="historial" class="seccion hidden">
+
                 <h2>Historial Entradas</h2>
 
                 <table>
+
                     <thead>
+
                         <tr>
                             <th>Nombre</th>
                             <th>Sección</th>
@@ -270,112 +447,257 @@
                             <th>Hora</th>
                             <th>Fecha</th>
                         </tr>
+
                     </thead>
 
                     <tbody id="tablaHistorial"></tbody>
+
                 </table>
+
             </div>
 
         </div>
 
     </div>
 
-    <!-- scanner -->
+    <!-- POPUP -->
+    <div id="registroModal" class="modal hidden">
+
+        <div class="modalBox">
+
+            <h2>Crear Cuenta</h2>
+
+            <input type="email" id="newUser" placeholder="Correo electrónico">
+
+            <input type="password" id="newPass" placeholder="Contraseña">
+
+            <button onclick="crearCuenta()">
+Registrarme
+</button>
+
+            <button onclick="cerrarRegistro()" class="red">
+Cerrar
+</button>
+
+        </div>
+
+    </div>
+
+    <!-- SCANNER -->
     <div id="scannerModal">
-        <button onclick="cerrarScanner()" class="red">Cerrar</button>
+
+        <button onclick="cerrarScanner()" class="red">
+Cerrar
+</button>
+
         <div id="reader"></div>
-        <div id="scanMsg">Apunte la cámara al QR</div>
+
+        <div id="scanMsg">
+            Apunte la cámara al QR
+        </div>
+
     </div>
 
     <script>
-        let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-        let registros = JSON.parse(localStorage.getItem("registros")) || [];
-        let historial = JSON.parse(localStorage.getItem("historial")) || [];
+        let usuarios =
+            JSON.parse(localStorage.getItem("usuarios")) || [];
 
-        let actual = localStorage.getItem("activo");
+        let registros =
+            JSON.parse(localStorage.getItem("registros")) || [];
+
+        let historial =
+            JSON.parse(localStorage.getItem("historial")) || [];
+
+        let actual =
+            localStorage.getItem("activo");
+
         let scanner;
 
+        /* AUTO LOGIN */
+
         if (actual) {
+
             entrarPanel();
             mostrarHistorial();
+
         }
 
-        /* usuario */
-        function crearCuenta() {
+        /* CREAR CUENTA */
+        async function crearCuenta() {
 
-            let u = newUser.value.trim();
+            let u = newUser.value.trim().toLowerCase();
             let p = newPass.value.trim();
 
-            if (!u || !p) return alert("Complete datos");
+            if (!u || !p) {
+                alert("Complete datos");
+                return;
+            }
 
-            if (usuarios.find(x => x.user === u))
-                return alert("Ya existe");
+            let respuesta = await fetch("/registro", {
 
-            usuarios.push({
-                user: u,
-                pass: p
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    correo: u,
+                    password: p
+                })
+
             });
 
-            localStorage.setItem("usuarios", JSON.stringify(usuarios));
+            let data = await respuesta.json();
 
-            alert("Cuenta creada");
-        }
+            alert(data.mensaje);
 
-        function login() {
+            if (data.ok) {
 
-            let u = loginUser.value.trim();
-            let p = loginPass.value.trim();
+                newUser.value = "";
+                newPass.value = "";
 
-            let ok = usuarios.find(x => x.user === u && x.pass === p);
-
-            if (ok) {
-                localStorage.setItem("activo", u);
-                actual = u;
-                entrarPanel();
-                mostrarHistorial();
-            } else {
-                alert("Datos incorrectos");
+                cerrarRegistro();
             }
         }
 
-        function logout() {
-            localStorage.removeItem("activo");
-            location.reload();
+
+        /* LOGIN */
+
+        function login() {
+
+            let u =
+                loginUser.value.trim().toLowerCase();
+
+            let p =
+                loginPass.value.trim();
+
+            loginUser.style.border = "none";
+            loginPass.style.border = "none";
+
+            if (!u || !p) {
+
+                alert("Complete datos");
+                return;
+
+            }
+
+            let existe =
+                usuarios.find(x => x.user === u);
+
+            if (!existe) {
+
+                loginUser.style.border =
+                    "2px solid red";
+
+                alert("Correo no existe");
+
+                return;
+
+            }
+
+            if (existe.pass !== p) {
+
+                loginPass.style.border =
+                    "2px solid red";
+
+                alert("Contraseña incorrecta");
+
+                return;
+
+            }
+
+            localStorage.setItem("activo", u);
+
+            actual = u;
+
+            entrarPanel();
+
+            mostrarHistorial();
+
         }
+
+        /* LOGOUT */
+
+        function logout() {
+
+            localStorage.removeItem("activo");
+
+            location.reload();
+
+        }
+
+        /* ENTRAR */
 
         function entrarPanel() {
+
             loginBox.classList.add("hidden");
+
             panel.classList.remove("hidden");
+
+            bienvenida.innerHTML =
+                "Bienvenido: " + actual;
+
             mostrarTabla();
+
         }
 
-        /* menu */
+        /* MENU */
+
         function mostrar(id) {
 
-            document.querySelectorAll(".seccion")
+            document
+                .querySelectorAll(".seccion")
                 .forEach(x => x.classList.add("hidden"));
 
-            document.getElementById(id)
+            document
+                .getElementById(id)
                 .classList.remove("hidden");
+
         }
 
-        /* guardar */
+        /* POPUP */
+
+        function mostrarRegistro() {
+
+            registroModal.classList.remove("hidden");
+
+        }
+
+        function cerrarRegistro() {
+
+            registroModal.classList.add("hidden");
+
+        }
+
+        /* GUARDAR */
+
         function guardar() {
 
             let nom = nombre.value.trim();
             let sec = seccion.value.trim();
             let tipoEst = tipo.value;
 
-            if (!nom || !sec) return alert("Complete");
+            if (!nom || !sec) {
+
+                alert("Complete datos");
+                return;
+
+            }
 
             registros.push({
+
                 encargado: actual,
                 nombre: nom,
                 seccion: sec,
                 tipo: tipoEst
+
             });
 
-            localStorage.setItem("registros", JSON.stringify(registros));
+            localStorage.setItem(
+                "registros",
+                JSON.stringify(registros)
+            );
 
             nombre.value = "";
             seccion.value = "";
@@ -383,12 +705,15 @@
             mostrarTabla();
 
             alert("Guardado");
+
         }
 
-        /* tabla */
+        /* TABLA */
+
         function mostrarTabla() {
 
-            let b = buscar.value.toLowerCase();
+            let b =
+                buscar.value.toLowerCase();
 
             tabla.innerHTML = "";
 
@@ -402,116 +727,197 @@
 <td>${r.nombre}</td>
 <td>${r.seccion}</td>
 <td>${r.tipo}</td>
-<td><button onclick="eliminar(${i})" class="red">X</button></td>
+<td>
+<button onclick="eliminar(${i})" class="red">
+X
+</button>
+</td>
 </tr>
 `;
 
                 });
+
         }
 
         function eliminar(i) {
 
-            let datos = registros.filter(x => x.encargado === actual);
+            let pin =
+                prompt("Ingrese PIN ADMIN");
+
+            if (pin !== "CICOMED#2026") {
+
+                alert("PIN incorrecto");
+                return;
+
+            }
+
+            let datos =
+                registros.filter(x => x.encargado === actual);
+
             let item = datos[i];
 
-            registros = registros.filter(x => x !== item);
+            registros =
+                registros.filter(x => x !== item);
 
-            localStorage.setItem("registros", JSON.stringify(registros));
-
-            mostrarTabla();
-        }
-
-        /* qr */
-        function crearQR() {
-
-            let nom = buscarQR.value.trim();
-
-            let alumno = registros.find(x =>
-                x.encargado === actual &&
-                x.nombre.toLowerCase() === nom.toLowerCase()
+            localStorage.setItem(
+                "registros",
+                JSON.stringify(registros)
             );
 
-            if (!alumno) return alert("No existe");
+            mostrarTabla();
+
+        }
+
+        /* QR */
+
+        function crearQR() {
+
+            let nom =
+                buscarQR.value.trim();
+
+            let alumno =
+                registros.find(x =>
+
+                    x.encargado === actual &&
+                    x.nombre.toLowerCase() === nom.toLowerCase()
+
+                );
+
+            if (!alumno) {
+
+                alert("No existe");
+                return;
+
+            }
 
             let datosQR = JSON.stringify({
+
                 nombre: alumno.nombre,
                 seccion: alumno.seccion,
                 tipo: alumno.tipo
+
             });
 
             resultadoQR.innerHTML = `
+
 <p><b>${alumno.nombre}</b></p>
 <p>${alumno.seccion}</p>
 <p>${alumno.tipo}</p>
+
 <div id="qrcode" class="qrbox"></div>
+
 `;
 
-            new QRCode(document.getElementById("qrcode"), {
-                text: datosQR,
-                width: 200,
-                height: 200
-            });
+            new QRCode(
+                document.getElementById("qrcode"),
+
+                {
+                    text: datosQR,
+                    width: 200,
+                    height: 200
+                }
+
+            );
+
         }
 
-        /* scanner */
+        /* SCANNER */
+
         function abrirScanner() {
 
             scannerModal.style.display = "flex";
 
-            scanner = new Html5Qrcode("reader");
+            scanner =
+                new Html5Qrcode("reader");
 
-            scanner.start({
+            scanner.start(
+
+                {
                     facingMode: "environment"
-                }, {
+                },
+
+                {
                     fps: 10,
                     qrbox: 250
                 },
+
                 scanOK
+
             );
+
         }
 
-        /* control 1 vez por dia */
         function scanOK(txt) {
 
             try {
 
                 let d = JSON.parse(txt);
 
-                let hoy = new Date().toLocaleDateString();
-                let hora = new Date().toLocaleTimeString();
+                let hoy =
+                    new Date().toLocaleDateString();
 
-                let usado = historial.find(x =>
-                    x.nombre === d.nombre &&
-                    x.fecha === hoy
-                );
+                let hora =
+                    new Date().toLocaleTimeString();
+
+                let usado =
+                    historial.find(x =>
+
+                        x.nombre === d.nombre &&
+                        x.fecha === hoy
+
+                    );
 
                 if (usado) {
 
                     scanMsg.innerHTML = `
-❌ ${d.nombre}<br>
-YA USÓ COMEDOR HOY
+<div style="color:#ef4444;font-size:28px;font-weight:bold;">
+❌ YA UTILIZADO
+</div>
+
+<div style="margin-top:10px;">
+${d.nombre}
+</div>
+
+<div style="margin-top:10px;">
+Hora anterior: ${usado.hora}
+</div>
 `;
 
                     beepError();
+
+                    navigator.vibrate(300);
+
                     return;
+
                 }
 
                 historial.push({
+
                     nombre: d.nombre,
                     seccion: d.seccion,
                     tipo: d.tipo,
                     hora: hora,
                     fecha: hoy
+
                 });
 
-                localStorage.setItem("historial", JSON.stringify(historial));
+                localStorage.setItem(
+                    "historial",
+                    JSON.stringify(historial)
+                );
 
                 scanMsg.innerHTML = `
-✔️ ${d.nombre}<br>
-${d.seccion}<br>
-${d.tipo}<br>
-${hora}<br>
-REGISTRADO
+<div style="color:#22c55e;font-size:28px;font-weight:bold;">
+✔ REGISTRADO
+</div>
+
+<div style="margin-top:10px;">
+${d.nombre}
+</div>
+
+<div>${d.seccion}</div>
+
+<div>${hora}</div>
 `;
 
                 beep();
@@ -519,18 +925,22 @@ REGISTRADO
                 mostrarHistorial();
 
             } catch {
+
                 scanMsg.innerHTML = "QR inválido";
+
             }
+
         }
 
-        /* historial */
         function mostrarHistorial() {
 
             tablaHistorial.innerHTML = "";
 
-            [...historial].reverse().forEach(r => {
+            [...historial]
+            .reverse()
+                .forEach(r => {
 
-                tablaHistorial.innerHTML += `
+                    tablaHistorial.innerHTML += `
 <tr>
 <td>${r.nombre}</td>
 <td>${r.seccion}</td>
@@ -540,26 +950,94 @@ REGISTRADO
 </tr>
 `;
 
-            });
+                });
+
         }
 
-        /* cerrar scanner */
         function cerrarScanner() {
 
-            scanner.stop().then(() => {
-                scannerModal.style.display = "none";
-                reader.innerHTML = "";
-            });
+            if (scanner) {
+
+                scanner.stop().then(() => {
+
+                    scannerModal.style.display = "none";
+
+                    reader.innerHTML = "";
+
+                });
+
+            }
+
         }
 
-        /* sonidos */
+        /* EXTRAS */
+
+        function togglePass() {
+
+            loginPass.type =
+                loginPass.type === "password" ?
+                "text" :
+                "password";
+
+        }
+
+        function recuperarClave() {
+
+            alert(
+                "Próximamente recuperación por Gmail"
+            );
+
+        }
+
         function beep() {
-            new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg").play();
+
+            new Audio(
+                "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
+            ).play();
+
         }
 
         function beepError() {
-            new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg").play();
+
+            new Audio(
+                "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
+            ).play();
+
         }
+
+        /* ENTER */
+
+        loginUser.addEventListener("keypress", function(e) {
+
+            if (e.key === "Enter") {
+
+                login();
+
+            }
+
+        });
+
+        loginPass.addEventListener("keypress", function(e) {
+
+            if (e.key === "Enter") {
+
+                login();
+
+            }
+
+        });
+
+        loginUser.addEventListener("input", function() {
+
+            loginUser.style.border = "none";
+
+        });
+
+        loginPass.addEventListener("input", function() {
+
+            loginPass.style.border = "none";
+
+        });
     </script>
 
 </body>
